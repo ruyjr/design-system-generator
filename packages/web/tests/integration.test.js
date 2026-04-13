@@ -118,5 +118,31 @@ describe('Integration Tests', () => {
         engine.urlValidator.validate('not a url at all!!!');
       }).toThrow();
     });
+
+    // HIGH-001: IPv6 SSRF prevention
+    test('should block IPv6 localhost (SSRF HIGH-001)', () => {
+      const engine = new AnalysisEngine();
+      expect(() => {
+        engine.urlValidator.validate('http://[::1]');
+      }).toThrow();
+    });
+
+    // HIGH-001: Link-local SSRF (AWS metadata)
+    test('should block link-local address 169.254.x.x (SSRF HIGH-001)', () => {
+      const engine = new AnalysisEngine();
+      expect(() => {
+        engine.urlValidator.validate('http://169.254.169.254');
+      }).toThrow();
+    });
+
+    // HIGH-002: Redirect SSRF - validator blocks private redirect target
+    test('should block redirect to private IP (SSRF HIGH-002)', () => {
+      const { NetworkError } = require('../src/utils/errors');
+      const URLValidator = require('../src/engine/URLValidator');
+      const v = new URLValidator();
+      // isPrivateIP on redirect target should catch before following
+      expect(v.isPrivateIP('http://169.254.169.254/metadata')).toBe(true);
+      expect(v.isPrivateIP('http://[::1]/secret')).toBe(true);
+    });
   });
 });

@@ -7,7 +7,7 @@ const BrowserManager = require('./BrowserManager');
 const URLValidator = require('./URLValidator');
 const SessionManager = require('./SessionManager');
 const DOMExtractor = require('./DOMExtractor');
-const { ValidationError, BrowserError, TimeoutError } = require('../utils/errors');
+const { BrowserError } = require('../utils/errors');
 const logger = require('../utils/logger');
 
 class AnalysisEngine {

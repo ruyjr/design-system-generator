@@ -55,19 +55,33 @@ class URLValidator {
       const urlObj = new URL(url);
       const hostname = urlObj.hostname;
 
-      // localhost
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // IPv4 localhost and unspecified
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
         return true;
       }
 
-      // Private IP ranges
+      // IPv6 localhost (::1 with or without brackets)
+      if (hostname === '::1' || hostname === '[::1]') {
+        return true;
+      }
+
+      // Strip IPv6 brackets for range checks
+      const bare = hostname.replace(/^\[|\]$/g, '');
+
+      // IPv6 loopback / unspecified
+      if (bare === '::1' || bare === '::' || bare === '0:0:0:0:0:0:0:1') {
+        return true;
+      }
+
+      // Private IPv4 ranges
       const privateRanges = [
-        /^10\./,           // 10.0.0.0/8
-        /^172\.(1[6-9]|2\d|3[01])\./,  // 172.16.0.0/12
-        /^192\.168\./,      // 192.168.0.0/16
+        /^10\./,                           // 10.0.0.0/8
+        /^172\.(1[6-9]|2\d|3[01])\./,     // 172.16.0.0/12
+        /^192\.168\./,                     // 192.168.0.0/16
+        /^169\.254\./,                     // 169.254.0.0/16 (link-local / AWS metadata)
       ];
 
-      return privateRanges.some(range => range.test(hostname));
+      return privateRanges.some((range) => range.test(bare));
     } catch {
       return false;
     }
@@ -103,6 +117,14 @@ class URLValidator {
         const redirectUrl = response.headers.get('location');
         if (!redirectUrl) {
           throw new NetworkError('Redirect without location header', { url });
+        }
+
+        // SECURITY: block redirects to private/local addresses (SSRF prevention)
+        if (this.isPrivateIP(redirectUrl)) {
+          throw new NetworkError('Redirect to private address blocked (SSRF prevention)', {
+            from: url,
+            to: redirectUrl,
+          });
         }
 
         this.redirectCount += 1;
