@@ -1,0 +1,36 @@
+{
+  "name": "@design-system-generator/web",
+  "version": "1.0.0-alpha.1",
+  "description": "Website Analysis Engine for Design System Generator",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "design-system",
+    "website-analysis",
+    "visual-identity",
+    "puppeteer",
+    "dom-extraction"
+  ],
+  "author": "Design System Generator Team",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
