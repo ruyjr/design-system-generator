@@ -5,6 +5,7 @@
 
 const { ExtractionError } = require('../utils/errors');
 const logger = require('../utils/logger');
+const ColorExtractor = require('../extractors/ColorExtractor');
 
 class DOMExtractor {
   constructor() {
@@ -140,28 +141,19 @@ class DOMExtractor {
   }
 
   /**
-   * Extract color palette from elements
+   * Extract color palette from elements using ColorExtractor pipeline.
+   * Returns structured palette per AC 7 schema (Story 1.2).
    * @param {Array} elements - Array of elements
-   * @returns {Object} - Color palette
+   * @param {string} [url=''] - Source URL for metadata
+   * @returns {Object} - Structured color palette
    */
-  extractColorPalette(elements) {
-    const colors = new Set();
-
-    elements.forEach(el => {
-      if (el.styles.color && el.styles.color !== 'rgba(0, 0, 0, 0)') {
-        colors.add(el.styles.color);
-      }
-      if (el.styles.backgroundColor && el.styles.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-        colors.add(el.styles.backgroundColor);
-      }
+  extractColorPalette(elements, url = '') {
+    const colorExtractor = new ColorExtractor();
+    const palette = colorExtractor.extract(elements, url);
+    logger.debug('Color palette extracted', {
+      uniqueColors: palette.uniqueColorsAfterDedup,
+      paletteSize: palette.palette.length,
     });
-
-    const palette = {
-      colors: Array.from(colors),
-      count: colors.size,
-    };
-
-    logger.debug('Color palette extracted', { uniqueColors: palette.count });
     return palette;
   }
 

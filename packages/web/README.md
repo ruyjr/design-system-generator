@@ -36,7 +36,7 @@ async function analyzeWebsite() {
     
     console.log('Analysis Complete:');
     console.log(`  Elements Extracted: ${results.elements.length}`);
-    console.log(`  Colors Found: ${results.colorPalette.colors.length}`);
+    console.log(`  Colors Found: ${results.colorPalette.uniqueColorsAfterDedup}`);
     console.log(`  Fonts Found: ${results.typography.fonts.length}`);
     console.log(`  Duration: ${results.duration}ms`);
     
@@ -145,9 +145,9 @@ Extracts DOM elements and visual properties.
 - Extracts all DOM elements
 - Returns: Array of element objects
 
-**`extractColorPalette(elements)`**
-- Extracts color palette from elements
-- Returns: `{ colors: Array, count: number }`
+**`extractColorPalette(elements, url)`**
+- Extracts structured color palette using the ColorExtractor pipeline (Story 1.2)
+- Returns: Structured palette object (see Color Palette Object below)
 
 **`extractTypography(elements)`**
 - Extracts typography information
@@ -225,8 +225,10 @@ src/
 │   ├── AnalysisEngine.js       # Main orchestrator
 │   ├── BrowserManager.js        # Browser lifecycle
 │   ├── URLValidator.js          # URL validation
-│   ├── DOMExtractor.js          # DOM parsing
+│   ├── DOMExtractor.js          # DOM parsing + ColorExtractor integration
 │   └── SessionManager.js        # Session tracking
+├── extractors/
+│   └── ColorExtractor.js        # Full color pipeline (Story 1.2)
 ├── utils/
 │   ├── logger.js                # Logging utility
 │   └── errors.js                # Error classes
@@ -290,9 +292,41 @@ For issues and questions:
 2. Review error messages (descriptive error codes provided)
 3. Check acceptance criteria compliance in story 1.1
 
+### Color Palette Object (Story 1.2)
+```javascript
+{
+  extractedAt: "2026-04-13T...",
+  url: "https://example.com",
+  totalColorsFound: 89,
+  uniqueColorsAfterDedup: 24,
+  palette: [
+    {
+      id: "color_001",
+      hex: "#1A1A2E",
+      rgb: "rgb(26,26,46)",
+      hsl: "hsl(240,28%,14%)",
+      role: "primary",        // primary|secondary|accent|neutral|background|text|border|unknown
+      frequency: 142,          // number of DOM elements using this color
+      namedColor: "midnightblue",
+      namedColorDistance: 3.2,
+      hasAlpha: false,
+      wcag: {
+        vsWhite: { ratio: 14.5, level: "AAA" },
+        vsBlack: { ratio: 1.4, level: "FAIL" }
+      },
+      variants: ["#1B1B2F"]   // similar colors merged into this one
+    }
+  ],
+  contrastFailures: [
+    { text: "#888888", background: "#AAAAAA", ratio: 1.9, level: "FAIL" }
+  ],
+  accessibilityScore: 87      // % of text/bg pairs passing WCAG AA
+}
+```
+
 ## Roadmap
 
-- [ ] Story 1.2: Color Palette Extraction
+- [x] Story 1.2: Color Palette Extraction — Done
 - [ ] Story 1.3: Typography System Detection
 - [ ] Story 1.4: Spacing & Layout Pattern Analysis
 - [ ] Story 1.5: Design System Report Generation

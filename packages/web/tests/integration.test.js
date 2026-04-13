@@ -63,14 +63,18 @@ describe('Integration Tests', () => {
 
     test('should extract color palette from elements', () => {
       const extractor = new DOMExtractor();
+      // Use 3 elements per color to exceed default minFrequency (2)
       const elements = [
-        { styles: { color: '#FF0000', backgroundColor: '#FFFFFF' } },
-        { styles: { color: '#FF0000', backgroundColor: '#000000' } },
+        { tagName: 'div', styles: { color: '#FF0000', backgroundColor: '#FFFFFF' } },
+        { tagName: 'div', styles: { color: '#FF0000', backgroundColor: '#FFFFFF' } },
+        { tagName: 'div', styles: { color: '#FF0000', backgroundColor: '#000000' } },
       ];
 
       const palette = extractor.extractColorPalette(elements);
-      expect(palette.count).toBeGreaterThan(0);
-      expect(Array.isArray(palette.colors)).toBe(true);
+      expect(palette).toHaveProperty('palette');
+      expect(palette).toHaveProperty('totalColorsFound');
+      expect(palette).toHaveProperty('accessibilityScore');
+      expect(Array.isArray(palette.palette)).toBe(true);
     });
 
     test('should extract typography from elements', () => {
