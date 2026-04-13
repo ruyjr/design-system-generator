@@ -1,0 +1,91 @@
+# AIOS Core Configuration
+# Project: Design System Generator
+# Generated: 2026-04-13
+
+project:
+  name: design-system-generator
+  description: "Ferramenta para extrair identidade visual de websites e gerar Design Systems"
+  version: "1.0.0-alpha"
+
+# Development Story Location
+devStoryLocation: docs/stories
+
+# PRD Configuration
+prd:
+  location: docs/prd
+  sharded: false
+  fileName: PRD.md
+
+# Architecture Documentation
+architecture:
+  version: v4
+  location: docs/architecture
+  sharded: false
+  fileName: system-design.md
+  devLoadAlwaysFilesFallback:
+    - tech-stack.md
+    - unified-project-structure.md
+    - coding-standards.md
+    - testing-strategy.md
+
+# QA Configuration
+qa:
+  qaLocation: docs/qa
+  reportFormat: markdown
+  coderabbitReportsLocation: docs/qa/coderabbit-reports
+
+# CodeRabbit Integration
+coderabbit_integration:
+  enabled: true
+  modes:
+    dev:
+      severity_filter: [CRITICAL, HIGH]
+      max_iterations: 2
+      timeout_minutes: 30
+    qa:
+      severity_filter: [CRITICAL, HIGH]
+      max_iterations: 3
+      timeout_minutes: 30
+
+# Workflow Configuration
+workflow:
+  storyDevelopmentCycle: true
+  qaLoop: true
+  specPipeline: false
+  brownfieldDiscovery: false
+
+# Framework Protection
+boundary:
+  frameworkProtection: true
+
+# IDS (Incremental Development System)
+ids:
+  enabled: true
+  registryLocation: .aios/registry.json
+  pre_create_check: advisory
+  pre_modify_check: advisory
+
+# MCP Configuration
+mcp:
+  docker_mcp_enabled: false
+  playwright_enabled: true
+
+# Team Configuration
+team:
+  organization: ruyjr
+  mainBranch: main
+
+# Development Environment
+dev:
+  nodeVersion: ">=18.0.0"
+  packageManager: npm
+  testRunner: jest
+  linter: eslint
+
+# CI/CD
+cicd:
+  provider: github-actions
+  workflows:
+    - test
+    - lint
+    - build
